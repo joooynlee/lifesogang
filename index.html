@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>S+ | 서강대 자취 플랫폼</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ====================================================
+       NAVIGATION BAR
+       검색, 페이지 이동, 로그인/마이페이지 버튼 포함
+  ==================================================== -->
+  <nav id="navbar">
+    <div class="nav-left">
+      <button class="hamburger" id="menuBtn" aria-label="메뉴">&#9776;</button>
+      <a href="#home" class="nav-logo">S+</a>
+    </div>
+
+    <!-- 통합 검색바: 방/룸메 이름·지역 검색 -->
+    <div class="nav-search">
+      <span class="search-icon">&#128269;</span>
+      <input type="text" id="searchInput" placeholder="start your search" autocomplete="off" />
+    </div>
+
+    <div class="nav-right">
+      <a href="#map"     class="nav-link" data-page="map">&#128205; Map</a>
+      <a href="#handover" class="nav-link" data-page="handover">🤝 Handover</a>
+      <a href="#board"    class="nav-link" data-page="board">✏️ Communities</a>
+      <a href="#roomies"  class="nav-link" data-page="roomies">👥 Roomies</a>
+
+      <!-- 비로그인 상태: Sign in / Register 버튼 -->
+      <div id="authButtons">
+        <button class="btn-outline" id="signinBtn">Sign in</button>
+        <button class="btn-primary" id="registerBtn">Register</button>
+      </div>
+
+      <!-- 로그인 상태: 프로필 아이콘 → 마이페이지 사이드바 열기 -->
+      <div id="userButtons" class="hidden">
+        <button class="avatar-btn" id="mypageBtn">
+          <span id="navAvatarIcon">&#128100;</span>
+          <span id="navUsername"></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ====================================================
+       MAIN: 모든 페이지를 여기에 담고 JS로 show/hide
+  ==================================================== -->
+  <main id="main">
+
+    <!-- ================================================
+         HOME PAGE (#home)
+         히어로 배너 + 인수인계 미리보기 + 룸메 미리보기
+    ================================================ -->
+    <div id="page-home" class="page active">
+
+      <!-- 히어로: 비로그인 시 로그인 유도, 로그인 시 맞춤 인사 -->
+      <section class="hero" id="heroSection">
+        <div class="hero-content">
+          <h1 id="heroTitle">로그인 후 이용해주세요.</h1>
+          <p id="heroSubtitle">서강대학교 학생 전용 자취 플랫폼</p>
+          <div class="hero-btns" id="heroBtns">
+            <button class="btn-outline-lg" id="heroSignin">Sign in</button>
+            <button class="btn-primary-lg" id="heroRegister">Register</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Handover 섹션: 이전 거주자가 올린 방 인수인계 및 물건 대여 미리보기 -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">Handover</h2>
+          <p class="section-sub">방 인수인계와 물건 대여를 확인해보세요</p>
+        </div>
+        <div class="cards-row" id="takeonPreview"></div>
+      </section>
+
+      <!-- Communities 섹션: 자취방 후기·질문·꿀팁 미리보기 -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">Communities</h2>
+          <p class="section-sub">최근 자취 게시글</p>
+        </div>
+        <div class="quotes-row" id="reviewsPreview"></div>
+      </section>
+
+      <!-- 룸메이트 섹션: 구인 중인 룸메이트 미리보기 -->
+      <section class="section section-roomies">
+        <div class="section-header">
+          <h2 class="section-title">Roomies</h2>
+          <p class="section-sub">서강대 근처 룸메이트를 찾아보세요</p>
+        </div>
+        <div class="cards-row roomies-row" id="roomiesPreview"></div>
+      </section>
+    </div>
+
+    <!-- ================================================
+         MAP PAGE (#map)
+         매물 / 룸메 스위치 + 지도 영역 + 목록 사이드바
+    ================================================ -->
+    <div id="page-map" class="page">
+      <div class="map-container">
+
+        <!-- 매물·룸메 토글 스위치 -->
+        <div class="map-toggle">
+          <button class="toggle-btn active" id="toggleProperties" onclick="setMapMode('properties')">매물</button>
+          <button class="toggle-btn"        id="toggleRoomies"    onclick="setMapMode('roomies')">룸메</button>
+        </div>
+
+        <!-- 지도 영역: 카카오맵 API 연동 예정 -->
+        <div id="kakao-map" class="map-area">
+          <div class="map-placeholder">
+            <p style="font-size:48px">&#128506;</p>
+            <p>지도 영역</p>
+            <p class="map-note">Kakao Map API 키를 app.js 상단 KAKAO_MAP_KEY에 입력하면 실제 지도가 표시됩니다</p>
+          </div>
+          <!-- JS로 동적으로 방/룸메 마커 배치 -->
+          <div class="map-markers" id="mapMarkers"></div>
+        </div>
+
+        <!-- 지도 오른쪽 사이드바: 현재 모드에 따른 목록 표시 -->
+        <div class="map-sidebar">
+          <div class="map-sidebar-list" id="mapList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================
+         BOARD PAGE (#board)
+         익명 자취방 후기 게시판 (로그인 후 글쓰기 가능)
+    ================================================ -->
+    <div id="page-board" class="page">
+      <div class="board-container">
+        <div class="board-header">
+          <div>
+            <h2>자취방 게시판</h2>
+            <p class="board-desc">실거주자의 솔직한 후기 (익명)</p>
+          </div>
+          <!-- 글쓰기: 로그인 필요 -->
+          <button class="btn-primary" onclick="openWritePost()">글쓰기</button>
+        </div>
+
+        <!-- 카테고리 필터 탭 -->
+        <div class="board-categories">
+          <button class="cat-btn active" data-cat="all"      onclick="filterBoard(this,'all')">전체</button>
+          <button class="cat-btn"        data-cat="review"   onclick="filterBoard(this,'review')">후기</button>
+          <button class="cat-btn"        data-cat="question" onclick="filterBoard(this,'question')">질문</button>
+          <button class="cat-btn"        data-cat="tip"      onclick="filterBoard(this,'tip')">꿀팁</button>
+        </div>
+
+        <!-- 게시글 목록: JS로 동적 렌더링 -->
+        <div class="post-list" id="postList"></div>
+      </div>
+    </div>
+
+    <!-- ================================================
+         ROOMIES PAGE (#roomies)
+         룸메이트 구인/구직 + 룸메궁합 필터
+    ================================================ -->
+    <div id="page-roomies" class="page">
+      <div class="roomies-container">
+        <div class="roomies-header">
+          <h2>Roomies</h2>
+          <p>서강대 근처 룸메이트를 찾아보세요</p>
+        </div>
+
+        <!-- 룸메 필터 사이드바: 지역·성별·예산·생활스타일 -->
+        <div class="roomies-filter">
+          <h3>룸메 필터</h3>
+          <div class="filter-row">
+            <label>지역</label>
+            <select id="filterArea">
+              <option value="">전체</option>
+              <option value="신촌">신촌</option>
+              <option value="이대">이대</option>
+              <option value="홍대">홍대</option>
+              <option value="마포">마포</option>
+            </select>
+          </div>
+          <div class="filter-row">
+            <label>성별</label>
+            <select id="filterGender">
+              <option value="">무관</option>
+              <option value="female">여성</option>
+              <option value="male">남성</option>
+            </select>
+          </div>
+          <div class="filter-row">
+            <label>월세 범위</label>
+            <select id="filterPrice">
+              <option value="">전체</option>
+              <option value="50">~50만원</option>
+              <option value="70">~70만원</option>
+              <option value="100">~100만원</option>
+            </select>
+          </div>
+          <div class="filter-row">
+            <label>생활 스타일</label>
+            <select id="filterStyle">
+              <option value="">전체</option>
+              <option value="quiet">조용함 선호</option>
+              <option value="active">활동적</option>
+              <option value="homebody">집순이/집돌이</option>
+            </select>
+          </div>
+          <button class="btn-primary btn-full" onclick="applyRoomiesFilter()">필터 적용</button>
+          <!-- 룸메궁합: 마이페이지에서 저장한 성향으로 매칭 -->
+          <button class="btn-outline btn-full" style="margin-top:8px" onclick="showCompatibility()">
+            &#128302; 룸메궁합으로 찾기
+          </button>
+        </div>
+
+        <!-- 룸메이트 카드 그리드 -->
+        <div class="roomies-grid" id="roomiesGrid"></div>
+      </div>
+    </div>
+
+    <!-- ================================================
+         HANDOVER PAGE (#handover)
+         이전 거주자의 방 인수인계 및 물건 대여 게시판
+    ================================================ -->
+    <div id="page-handover" class="page">
+      <div class="takeon-container">
+        <div class="takeon-header">
+          <div>
+            <h2>Handover</h2>
+            <p>방 인수인계와 물건 대여를 한곳에서 확인하세요</p>
+          </div>
+          <!-- 등록: 로그인 필요 -->
+          <button class="btn-primary" onclick="openWriteTakeon()">Handover 등록</button>
+        </div>
+
+        <!-- 지역·방 종류 필터 -->
+        <div class="takeon-filters">
+          <select id="takeonCategory" onchange="applyTakeonFilter()">
+            <option value="">전체 유형</option>
+            <option value="room">방 인수인계</option>
+            <option value="rental">물건 대여</option>
+          </select>
+          <select id="takeonArea" onchange="applyTakeonFilter()">
+            <option value="">전체 지역</option>
+            <option value="신촌">신촌</option>
+            <option value="이대">이대</option>
+            <option value="대흥">대흥</option>
+            <option value="기타">기타</option>
+          </select>
+          <select id="takeonType" onchange="applyTakeonFilter()">
+            <option value="">전체 방/물건 종류</option>
+            <option value="원룸">원룸</option>
+            <option value="투룸">투룸</option>
+            <option value="오피스텔">오피스텔</option>
+            <option value="가전제품">가전제품</option>
+            <option value="생활용품">생활용품</option>
+          </select>
+        </div>
+
+        <!-- 인수인계 카드 그리드 -->
+        <div class="takeon-grid" id="takeonGrid"></div>
+      </div>
+    </div>
+
+  </main><!-- /main -->
+
+
+  <!-- ====================================================
+       MODAL: 로그인
+       서강대 이메일(@sogang.ac.kr)로만 로그인 허용
+  ==================================================== -->
+  <div id="modal-login" class="modal hidden">
+    <div class="modal-backdrop" onclick="closeModal('login')"></div>
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal('login')">&#10005;</button>
+      <h2 class="modal-title">Sign in</h2>
+      <p class="modal-desc">서강대학교 이메일로 로그인하세요</p>
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label>서강대 이메일</label>
+          <input type="email" id="loginEmail" placeholder="example@sogang.ac.kr" required />
+          <span class="form-hint">@sogang.ac.kr 이메일만 사용 가능합니다</span>
+        </div>
+        <div class="form-group">
+          <label>비밀번호</label>
+          <input type="password" id="loginPassword" placeholder="비밀번호 입력" required />
+        </div>
+        <div class="form-error hidden" id="loginError"></div>
+        <button type="submit" class="btn-primary btn-full">로그인</button>
+      </form>
+      <p class="modal-footer">
+        계정이 없으신가요?
+        <button class="link-btn" onclick="switchModal('login','register')">회원가입</button>
+      </p>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       MODAL: 회원가입
+       서강대 이메일 인증 코드 발송 후 가입 처리
+  ==================================================== -->
+  <div id="modal-register" class="modal hidden">
+    <div class="modal-backdrop" onclick="closeModal('register')"></div>
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal('register')">&#10005;</button>
+      <h2 class="modal-title">Register</h2>
+      <form id="registerForm" onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label>서강대 이메일 *</label>
+          <div class="input-row">
+            <input type="email" id="regEmail" placeholder="example@sogang.ac.kr" required />
+            <button type="button" class="btn-verify" onclick="sendVerification()">인증 발송</button>
+          </div>
+          <span class="form-hint">@sogang.ac.kr 이메일만 사용 가능합니다</span>
+        </div>
+        <!-- 인증 코드 입력란: 발송 후 표시 -->
+        <div class="form-group" id="verifyCodeGroup" style="display:none">
+          <label>인증 코드</label>
+          <div class="input-row">
+            <input type="text" id="verifyCode" placeholder="6자리 코드" maxlength="6" />
+            <button type="button" class="btn-verify" onclick="checkVerification()">확인</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>닉네임 *</label>
+          <input type="text" id="regNickname" placeholder="닉네임" required />
+        </div>
+        <div class="form-group">
+          <label>비밀번호 *</label>
+          <input type="password" id="regPassword" placeholder="8자 이상" required minlength="8" />
+        </div>
+        <div class="form-group">
+          <label>성별</label>
+          <select id="regGender">
+            <option value="">선택 안함</option>
+            <option value="female">여성</option>
+            <option value="male">남성</option>
+          </select>
+        </div>
+        <div class="form-error hidden" id="registerError"></div>
+        <button type="submit" class="btn-primary btn-full">가입하기</button>
+      </form>
+      <p class="modal-footer">
+        이미 계정이 있으신가요?
+        <button class="link-btn" onclick="switchModal('register','login')">로그인</button>
+      </p>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       MODAL: 게시판 글쓰기 (익명으로 게시됨)
+  ==================================================== -->
+  <div id="modal-writepost" class="modal hidden">
+    <div class="modal-backdrop" onclick="closeModal('writepost')"></div>
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal('writepost')">&#10005;</button>
+      <h2 class="modal-title">글쓰기</h2>
+      <p class="text-muted small" style="margin-bottom:20px">익명으로 게시됩니다</p>
+      <form onsubmit="submitPost(event)">
+        <div class="form-group">
+          <label>카테고리</label>
+          <select id="postCategory">
+            <option value="review">후기</option>
+            <option value="question">질문</option>
+            <option value="tip">꿀팁</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>제목</label>
+          <input type="text" id="postTitle" placeholder="제목 입력" required />
+        </div>
+        <div class="form-group">
+          <label>내용</label>
+          <textarea id="postContent" rows="5" placeholder="내용 입력" required></textarea>
+        </div>
+        <button type="submit" class="btn-primary btn-full">게시하기</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       MODAL: Handover 등록 (로그인 필요)
+  ==================================================== -->
+  <div id="modal-writetakeon" class="modal hidden">
+    <div class="modal-backdrop" onclick="closeModal('writetakeon')"></div>
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal('writetakeon')">&#10005;</button>
+      <h2 class="modal-title">Handover 등록</h2>
+      <form onsubmit="submitTakeon(event)">
+        <div class="form-group">
+          <label>유형 *</label>
+          <select id="newTakeonCategory" required>
+            <option value="room">방 인수인계</option>
+            <option value="rental">물건 대여</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>지역 *</label>
+          <select id="newTakeonArea" required>
+            <option value="">선택</option>
+            <option value="신촌">신촌</option>
+            <option value="이대">이대</option>
+            <option value="대흥">대흥</option>
+            <option value="기타">기타</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>방/물건 종류 *</label>
+          <select id="newTakeonType" required>
+            <option value="">선택</option>
+            <option value="원룸">원룸</option>
+            <option value="투룸">투룸</option>
+            <option value="오피스텔">오피스텔</option>
+            <option value="가전제품">가전제품</option>
+            <option value="생활용품">생활용품</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>보증금 또는 대여비 (만원)</label>
+          <input type="number" id="newTakeonDeposit" placeholder="예: 500 또는 2" min="0" />
+        </div>
+        <div class="form-group">
+          <label>월세 (방 인수인계 시, 만원)</label>
+          <input type="number" id="newTakeonRent" placeholder="예: 45" min="0" />
+        </div>
+        <div class="form-group">
+          <label>인수/대여 희망일 *</label>
+          <input type="date" id="newTakeonDate" required />
+        </div>
+        <div class="form-group">
+          <label>대여 기간</label>
+          <input type="text" id="newTakeonPeriod" placeholder="예: 7월~9월, 3개월" />
+        </div>
+        <div class="form-group">
+          <label>상세 설명</label>
+          <textarea id="newTakeonDesc" rows="4"
+            placeholder="방 상태, 포함 가구/가전, 물건 상태, 주의사항 등을 적어주세요"></textarea>
+        </div>
+        <button type="submit" class="btn-primary btn-full">등록하기</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       SIDEBAR: 마이페이지
+       우측에서 슬라이드인 — 내 정보 탭 + 룸메궁합 탭
+  ==================================================== -->
+  <div id="sidebar-mypage" class="sidebar hidden">
+    <div class="sidebar-backdrop" onclick="closeSidebar()"></div>
+    <div class="sidebar-panel">
+      <div class="sidebar-header">
+        <h2>마이페이지</h2>
+        <button onclick="closeSidebar()">&#10005;</button>
+      </div>
+
+      <!-- 프로필 요약 -->
+      <div class="mypage-profile">
+        <div class="profile-avatar-lg">&#128100;</div>
+        <h3 id="mypageName"></h3>
+        <p id="mypageEmail" class="text-muted"></p>
+      </div>
+
+      <!-- 탭: 내 정보 / 룸메궁합 -->
+      <div class="mypage-tabs">
+        <button class="tab-btn active" onclick="switchTab(this,'tab-info')">내 정보</button>
+        <button class="tab-btn"        onclick="switchTab(this,'tab-compat')">룸메궁합</button>
+      </div>
+
+      <!-- 내 정보 탭 -->
+      <div id="tab-info" class="tab-content active">
+        <div class="info-section">
+          <h4>내 게시글</h4>
+          <div id="myPosts" class="text-muted small">아직 작성한 게시글이 없습니다</div>
+        </div>
+        <div class="info-section">
+          <h4>찜한 방</h4>
+          <div id="myFavorites" class="text-muted small">아직 찜한 방이 없습니다</div>
+        </div>
+        <button class="btn-outline btn-full" style="margin-top:16px" onclick="logout()">로그아웃</button>
+      </div>
+
+      <!-- 룸메궁합 탭: 생활 성향 입력 → 어울리는 룸메 유형 분석 -->
+      <div id="tab-compat" class="tab-content">
+        <p class="text-muted small" style="margin-bottom:16px">
+          내 생활 성향을 입력하면 잘 맞는 룸메이트를 추천해드려요
+        </p>
+        <div class="compat-form">
+          <div class="compat-item">
+            <label>취침 시간</label>
+            <select id="compatSleep">
+              <option value="early">일찍 (11시 이전)</option>
+              <option value="normal">보통 (12시 전후)</option>
+              <option value="late">늦게 (새벽 1시 이후)</option>
+            </select>
+          </div>
+          <div class="compat-item">
+            <label>청결도</label>
+            <select id="compatClean">
+              <option value="very">매우 깔끔</option>
+              <option value="normal">보통</option>
+              <option value="free">자유로운 편</option>
+            </select>
+          </div>
+          <div class="compat-item">
+            <label>소음 민감도</label>
+            <select id="compatNoise">
+              <option value="sensitive">민감</option>
+              <option value="normal">보통</option>
+              <option value="tolerant">둔감</option>
+            </select>
+          </div>
+          <div class="compat-item">
+            <label>흡연 여부</label>
+            <select id="compatSmoking">
+              <option value="no">비흡연</option>
+              <option value="yes">흡연</option>
+            </select>
+          </div>
+          <div class="compat-item">
+            <label>손님 초대 빈도</label>
+            <select id="compatGuest">
+              <option value="rare">거의 없음</option>
+              <option value="sometimes">가끔</option>
+              <option value="often">자주</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-primary btn-full" onclick="saveCompatProfile()">저장 &amp; 룸메 찾기</button>
+
+        <!-- 궁합 분석 결과 (저장 후 표시) -->
+        <div id="compatResults" class="compat-results hidden">
+          <div id="compatBadge" class="compat-badge"></div>
+          <h4 id="compatType"></h4>
+          <p id="compatDesc" class="text-muted small"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

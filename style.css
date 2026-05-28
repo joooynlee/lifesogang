@@ -1,0 +1,699 @@
+/* ====================================================
+   S+ 스타일시트 — 서강대 자취 플랫폼
+   직방·Roomies 레퍼런스 기반 미니멀 디자인
+==================================================== */
+
+/* ===== 디자인 토큰 ===== */
+:root {
+  --primary:      #1a1a1a;
+  --primary-h:    #333;
+  --secondary:    #555;
+  --muted:        #999;
+  --bg:           #ffffff;
+  --bg-light:     #f5f5f5;
+  --bg-hero:      #f0f0f0;
+  --border:       #e0e0e0;
+  --border-light: #efefef;
+  --shadow:       0 2px 8px rgba(0,0,0,0.08);
+  --shadow-h:     0 4px 16px rgba(0,0,0,0.13);
+  --radius:       8px;
+  --radius-lg:    12px;
+  --nav-h:        56px;
+  --sidebar-w:    380px;
+}
+
+/* ===== 리셋 ===== */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',
+               'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  color: var(--primary);
+  background: var(--bg);
+  font-size: 14px;
+  line-height: 1.6;
+}
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; border: none; background: none; font-family: inherit; font-size: inherit; }
+input, select, textarea { font-family: inherit; font-size: 14px; }
+
+/* ===== 유틸리티 ===== */
+.hidden      { display: none !important; }
+.text-muted  { color: var(--secondary); }
+.small       { font-size: 12px; }
+.btn-full    { width: 100%; }
+
+
+/* ====================================================
+   NAVIGATION BAR
+==================================================== */
+#navbar {
+  position: fixed; top:0; left:0; right:0; z-index: 1000;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 20px; height: var(--nav-h); gap: 12px;
+}
+
+.nav-left { display:flex; align-items:center; gap:10px; flex-shrink:0; }
+
+/* 햄버거 메뉴 버튼 */
+.hamburger { font-size:18px; padding:4px 8px; color:var(--secondary); }
+.hamburger:hover { color:var(--primary); }
+
+.nav-logo { font-size:20px; font-weight:800; letter-spacing:-1px; }
+
+/* 통합 검색바 */
+.nav-search {
+  flex:1; max-width:480px;
+  display:flex; align-items:center; gap:8px;
+  background: var(--bg-light);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 0 16px; height: 38px;
+}
+.search-icon { font-size:14px; color:var(--muted); }
+.nav-search input {
+  flex:1; border:none; background:transparent; outline:none;
+  color:var(--primary); font-size:13px;
+}
+.nav-search input::placeholder { color:var(--muted); }
+
+/* 우측 네비게이션 영역 */
+.nav-right {
+  display:flex; align-items:center; gap:14px;
+  flex-shrink:0; margin-left:auto;
+}
+
+/* 네비 링크 */
+.nav-link {
+  font-size:13px; color:var(--secondary);
+  display:flex; align-items:center; gap:3px;
+  white-space:nowrap; transition:color .2s;
+}
+.nav-link:hover, .nav-link.active { color:var(--primary); font-weight:600; }
+
+/* 로그인 후 아바타 버튼 */
+.avatar-btn {
+  display:flex; align-items:center; gap:6px;
+  padding:5px 10px; border-radius:20px;
+  border:1px solid var(--border); transition:background .2s;
+  font-size:13px;
+}
+.avatar-btn:hover { background:var(--bg-light); }
+
+
+/* ====================================================
+   BUTTONS
+==================================================== */
+.btn-outline {
+  padding:6px 14px; border:1px solid var(--border);
+  border-radius:6px; color:var(--primary); font-size:13px;
+  background:#fff; transition:background .2s;
+}
+.btn-outline:hover { background:var(--bg-light); }
+
+.btn-primary {
+  padding:6px 14px; background:var(--primary);
+  color:#fff; border-radius:6px; font-size:13px;
+  transition:background .2s;
+}
+.btn-primary:hover { background:var(--primary-h); }
+
+/* 히어로 섹션용 큰 버튼 */
+.btn-outline-lg {
+  padding:10px 26px; border:1.5px solid var(--primary);
+  border-radius:8px; color:var(--primary); font-size:15px;
+  font-weight:500; background:transparent; transition:all .2s;
+}
+.btn-outline-lg:hover { background:var(--primary); color:#fff; }
+
+.btn-primary-lg {
+  padding:10px 26px; background:var(--primary);
+  color:#fff; border-radius:8px; font-size:15px;
+  font-weight:500; transition:background .2s;
+}
+.btn-primary-lg:hover { background:#444; }
+
+
+/* ====================================================
+   MAIN / PAGE ROUTING
+==================================================== */
+#main { padding-top: var(--nav-h); min-height:100vh; }
+
+/* JS가 .active 클래스로 페이지 전환 */
+.page         { display:none; }
+.page.active  { display:block; }
+
+
+/* ====================================================
+   HOME — HERO SECTION
+   로그인 전: 로그인 유도 / 로그인 후: 맞춤 인사
+==================================================== */
+.hero {
+  background: var(--bg-hero);
+  display:flex; align-items:center; justify-content:center;
+  min-height: 300px; padding: 60px 24px;
+}
+.hero-content { text-align:center; max-width:480px; }
+.hero-content h1 {
+  font-size:28px; font-weight:700;
+  letter-spacing:-0.5px; margin-bottom:8px;
+}
+.hero-content p { color:var(--secondary); font-size:14px; margin-bottom:24px; }
+.hero-btns { display:flex; gap:12px; justify-content:center; }
+
+
+/* ====================================================
+   HOME — SECTION COMMON
+==================================================== */
+.section {
+  padding:40px 24px;
+  max-width:1200px; margin:0 auto;
+}
+.section-header { margin-bottom:20px; }
+.section-title  { font-size:20px; font-weight:700; }
+.section-sub    { color:var(--secondary); font-size:13px; margin-top:4px; }
+
+/* 가로 스크롤 카드 행 */
+.cards-row {
+  display:flex; gap:16px;
+  overflow-x:auto; padding-bottom:8px;
+  scrollbar-width:none;
+}
+.cards-row::-webkit-scrollbar { display:none; }
+
+
+/* ====================================================
+   HOME — TAKE ON 미리보기 카드
+==================================================== */
+.takeon-card {
+  flex-shrink:0; width:180px;
+  background:#fff; border:1px solid var(--border-light);
+  border-radius:var(--radius); overflow:hidden;
+  cursor:pointer; transition:box-shadow .2s;
+}
+.takeon-card:hover { box-shadow:var(--shadow-h); }
+
+.takeon-card-img {
+  width:100%; height:120px;
+  background:var(--bg-light);
+  display:flex; align-items:center; justify-content:center;
+  font-size:44px; color:var(--muted);
+}
+.takeon-card-body { padding:10px; }
+.takeon-card-title { font-size:13px; font-weight:600; margin-bottom:3px; }
+.takeon-card-price { font-size:12px; color:var(--secondary); }
+.takeon-card-user  {
+  display:flex; align-items:center; gap:6px; margin-top:8px;
+}
+
+
+/* ====================================================
+   HOME — 후기 Quote 카드
+==================================================== */
+.quotes-row { display:flex; gap:16px; margin-top:24px; }
+
+.quote-card {
+  flex:1; padding:16px;
+  background:#fff; border:1px solid var(--border-light);
+  border-radius:var(--radius); cursor:pointer;
+  transition:box-shadow .2s;
+}
+.quote-card:hover { box-shadow:var(--shadow); }
+
+.quote-text {
+  font-size:13px; font-style:italic;
+  color:var(--primary); margin-bottom:12px;
+  overflow:hidden; display:-webkit-box;
+  -webkit-line-clamp:3; -webkit-box-orient:vertical;
+}
+.quote-user { display:flex; align-items:center; gap:8px; }
+
+/* 공용 아바타 */
+.avatar {
+  width:28px; height:28px; border-radius:50%;
+  background:var(--bg-light);
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px; overflow:hidden; flex-shrink:0;
+}
+.avatar-lg {
+  width:40px; height:40px; border-radius:50%;
+  background:var(--bg-light);
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; overflow:hidden; flex-shrink:0;
+}
+
+.quote-name { font-size:12px; font-weight:600; }
+.quote-desc { font-size:11px; color:var(--muted); }
+
+
+/* ====================================================
+   HOME — ROOMIES 미리보기
+==================================================== */
+.section-roomies {
+  background:var(--bg-light);
+  max-width:100%; padding:40px 48px;
+}
+
+/* 룸메이트 카드 (홈 미리보기) */
+.roomie-card {
+  flex-shrink:0; width:220px;
+  background:#fff; border:1px solid var(--border-light);
+  border-radius:var(--radius); padding:16px;
+  cursor:pointer; transition:box-shadow .2s;
+}
+.roomie-card:hover { box-shadow:var(--shadow-h); }
+
+.roomie-card-header  { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.roomie-name         { font-size:13px; font-weight:600; }
+.roomie-sub          { font-size:12px; color:var(--secondary); }
+.roomie-price        { font-size:14px; font-weight:700; margin-bottom:8px; }
+.roomie-desc {
+  font-size:12px; color:var(--secondary); margin-top:6px;
+  overflow:hidden; display:-webkit-box;
+  -webkit-line-clamp:2; -webkit-box-orient:vertical;
+}
+
+/* 태그 뱃지 */
+.roomie-tags { display:flex; gap:6px; flex-wrap:wrap; }
+.tag {
+  font-size:11px; padding:3px 8px;
+  border-radius:12px; background:var(--bg-light); color:var(--secondary);
+}
+
+
+/* ====================================================
+   MAP PAGE
+==================================================== */
+#page-map { height:calc(100vh - var(--nav-h)); }
+
+.map-container { display:flex; height:100%; position:relative; }
+
+/* 매물 / 룸메 토글 스위치 */
+.map-toggle {
+  position:absolute; top:16px; left:50%; transform:translateX(-50%);
+  z-index:10; display:flex;
+  background:#fff; border:1px solid var(--border);
+  border-radius:24px; padding:3px; box-shadow:var(--shadow);
+}
+.toggle-btn {
+  padding:6px 22px; border-radius:20px;
+  font-size:13px; color:var(--secondary); transition:all .2s;
+}
+.toggle-btn.active { background:var(--primary); color:#fff; font-weight:600; }
+
+/* 지도 표시 영역 */
+.map-area {
+  flex:1; background:#dde8d6; position:relative; overflow:hidden;
+}
+.map-placeholder {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  text-align:center; color:var(--secondary);
+}
+.map-note { font-size:11px; color:var(--muted); margin-top:6px; }
+
+/* 지도 위 가격 마커 */
+.map-markers { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; }
+.map-marker {
+  position:absolute;
+  background:var(--primary); color:#fff;
+  padding:5px 10px; border-radius:6px;
+  font-size:12px; font-weight:600;
+  cursor:pointer; pointer-events:all;
+  transition:transform .2s; white-space:nowrap;
+}
+.map-marker:hover { transform:scale(1.06); }
+/* 마커 아래 삼각형 */
+.map-marker::after {
+  content:''; position:absolute; top:100%; left:50%;
+  transform:translateX(-50%);
+  border:5px solid transparent;
+  border-top-color:var(--primary);
+}
+
+/* 지도 오른쪽 목록 사이드바 */
+.map-sidebar { width:300px; height:100%; background:#fff; border-left:1px solid var(--border); overflow-y:auto; }
+.map-sidebar-list { padding:12px; }
+
+.sidebar-card { padding:14px; border-bottom:1px solid var(--border-light); cursor:pointer; transition:background .15s; }
+.sidebar-card:hover { background:var(--bg-light); }
+.sidebar-card-title { font-size:13px; font-weight:600; margin-bottom:3px; }
+.sidebar-card-price { font-size:12px; color:var(--secondary); }
+.sidebar-card-tags  { display:flex; gap:6px; margin-top:8px; }
+
+
+/* ====================================================
+   BOARD PAGE
+==================================================== */
+.board-container { max-width:780px; margin:0 auto; padding:32px 24px; }
+
+.board-header {
+  display:flex; align-items:flex-start; justify-content:space-between;
+  margin-bottom:4px;
+}
+.board-header h2 { font-size:22px; font-weight:700; }
+.board-desc { color:var(--secondary); font-size:13px; margin-bottom:20px; }
+
+/* 카테고리 탭 */
+.board-categories {
+  display:flex; gap:8px;
+  border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:16px;
+}
+.cat-btn { padding:6px 14px; border-radius:20px; font-size:13px; color:var(--secondary); transition:all .2s; }
+.cat-btn.active         { background:var(--primary); color:#fff; }
+.cat-btn:hover:not(.active) { background:var(--bg-light); }
+
+/* 게시글 아이템 */
+.post-item {
+  padding:16px 0; border-bottom:1px solid var(--border-light);
+  cursor:pointer; transition:background .15s;
+}
+.post-item:hover { background:var(--bg-light); padding:16px 8px; margin:0 -8px; }
+
+/* 카테고리 뱃지 색상 */
+.post-category-badge {
+  display:inline-block; font-size:11px; padding:2px 8px;
+  border-radius:10px; margin-bottom:6px;
+}
+.badge-review   { background:#e8f4fd; color:#1a7fc1; }
+.badge-question { background:#fef9e7; color:#b8860b; }
+.badge-tip      { background:#eafaf1; color:#1e7e46; }
+
+.post-title   { font-size:14px; font-weight:600; margin-bottom:4px; }
+.post-preview {
+  font-size:12px; color:var(--secondary); margin-bottom:8px;
+  overflow:hidden; display:-webkit-box;
+  -webkit-line-clamp:1; -webkit-box-orient:vertical;
+}
+.post-meta { display:flex; gap:12px; font-size:11px; color:var(--muted); }
+
+
+/* ====================================================
+   ROOMIES PAGE
+==================================================== */
+.roomies-container {
+  max-width:1100px; margin:0 auto; padding:32px 24px;
+  display:grid;
+  grid-template-columns: 230px 1fr;
+  grid-template-rows: auto 1fr;
+  gap:24px;
+}
+.roomies-header { grid-column:1/-1; }
+.roomies-header h2 { font-size:22px; font-weight:700; }
+.roomies-header p  { color:var(--secondary); font-size:13px; }
+
+/* 왼쪽 필터 패널 */
+.roomies-filter {
+  background:var(--bg-light); border-radius:var(--radius);
+  padding:20px; height:fit-content;
+  position:sticky; top:calc(var(--nav-h) + 16px);
+}
+.roomies-filter h3 { font-size:15px; font-weight:600; margin-bottom:16px; }
+.filter-row         { margin-bottom:14px; }
+.filter-row label   { display:block; font-size:12px; color:var(--secondary); margin-bottom:5px; }
+.filter-row select  {
+  width:100%; padding:8px 10px;
+  border:1px solid var(--border); border-radius:var(--radius);
+  background:#fff; color:var(--primary); outline:none;
+}
+.roomies-filter .btn-primary { width:100%; padding:10px; }
+
+/* 룸메이트 카드 그리드 */
+.roomies-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap:16px; align-content:start;
+}
+
+/* 전체 페이지 룸메 카드 */
+.roomie-card-full {
+  background:#fff; border:1px solid var(--border-light);
+  border-radius:var(--radius); padding:16px;
+  cursor:pointer; transition:box-shadow .2s, transform .2s;
+}
+.roomie-card-full:hover { box-shadow:var(--shadow-h); transform:translateY(-2px); }
+
+
+/* ====================================================
+   TAKE ON PAGE
+==================================================== */
+.takeon-container { max-width:1100px; margin:0 auto; padding:32px 24px; }
+
+.takeon-header {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:6px; gap:12px;
+}
+.takeon-header h2 { font-size:22px; font-weight:700; white-space:nowrap; }
+.takeon-header p  { color:var(--secondary); font-size:13px; flex:1; }
+
+.takeon-filters { display:flex; gap:12px; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid var(--border); }
+.takeon-filters select {
+  padding:8px 12px; border:1px solid var(--border);
+  border-radius:var(--radius); background:#fff;
+  font-size:13px; outline:none; cursor:pointer;
+}
+
+/* 인수인계 카드 그리드 */
+.takeon-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap:20px;
+}
+
+/* 개별 카드 */
+.takeon-full-card {
+  background:#fff; border:1px solid var(--border-light);
+  border-radius:var(--radius-lg); overflow:hidden;
+  cursor:pointer; transition:box-shadow .2s, transform .2s;
+}
+.takeon-full-card:hover { box-shadow:var(--shadow-h); transform:translateY(-2px); }
+
+.takeon-full-card-img {
+  width:100%; height:160px;
+  background:var(--bg-light);
+  display:flex; align-items:center; justify-content:center;
+  font-size:52px;
+}
+.takeon-full-card-body { padding:14px; }
+.takeon-full-card-title  { font-size:15px; font-weight:600; margin-bottom:6px; }
+.takeon-full-card-price  { font-size:14px; font-weight:700; margin-bottom:6px; }
+.takeon-full-card-detail {
+  font-size:12px; color:var(--secondary); margin-bottom:10px;
+  overflow:hidden; display:-webkit-box;
+  -webkit-line-clamp:2; -webkit-box-orient:vertical;
+}
+.takeon-full-card-footer {
+  display:flex; align-items:center; justify-content:space-between;
+  padding-top:10px; border-top:1px solid var(--border-light);
+}
+.takeon-full-card-user { display:flex; align-items:center; gap:6px; font-size:12px; }
+.takeon-full-card-date { font-size:11px; color:var(--muted); }
+
+
+/* ====================================================
+   MODALS
+==================================================== */
+.modal {
+  position:fixed; top:0; left:0; right:0; bottom:0;
+  z-index:2000;
+  display:flex; align-items:center; justify-content:center;
+}
+
+/* 반투명 배경 클릭 시 닫힘 */
+.modal-backdrop {
+  position:absolute; top:0; left:0; right:0; bottom:0;
+  background:rgba(0,0,0,0.42);
+}
+
+/* 모달 박스 */
+.modal-box {
+  position:relative; background:#fff;
+  border-radius:var(--radius-lg); padding:32px;
+  width:100%; max-width:420px;
+  max-height:90vh; overflow-y:auto; z-index:1;
+}
+.modal-close {
+  position:absolute; top:16px; right:16px;
+  font-size:16px; color:var(--secondary);
+}
+.modal-close:hover { color:var(--primary); }
+.modal-title { font-size:22px; font-weight:700; margin-bottom:6px; }
+.modal-desc  { color:var(--secondary); font-size:13px; margin-bottom:24px; }
+.modal-footer{ text-align:center; font-size:13px; color:var(--secondary); margin-top:16px; }
+
+/* 폼 */
+.form-group { margin-bottom:16px; }
+.form-group label {
+  display:block; font-size:13px; font-weight:500;
+  margin-bottom:5px;
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width:100%; padding:10px 12px;
+  border:1px solid var(--border); border-radius:var(--radius);
+  outline:none; transition:border-color .2s;
+  color:var(--primary);
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus { border-color:var(--primary); }
+.form-hint { display:block; font-size:11px; color:var(--muted); margin-top:4px; }
+
+/* 입력 + 버튼 한 줄 */
+.input-row { display:flex; gap:8px; }
+.input-row input { flex:1; }
+.btn-verify {
+  padding:10px 12px; background:var(--bg-light);
+  border:1px solid var(--border); border-radius:var(--radius);
+  font-size:12px; white-space:nowrap; transition:background .2s;
+}
+.btn-verify:hover { background:var(--border); }
+
+/* 오류 메시지 */
+.form-error {
+  color:#c0392b; font-size:13px; padding:10px 12px;
+  background:#fdf2f2; border-radius:var(--radius); margin-bottom:12px;
+}
+
+.link-btn { color:var(--primary); font-weight:600; text-decoration:underline; }
+
+/* 채팅 모달 */
+.chat-box { max-width:480px; height:62vh; display:flex; flex-direction:column; padding:0; }
+.chat-header {
+  display:flex; align-items:center; gap:12px;
+  padding:16px 20px; border-bottom:1px solid var(--border);
+}
+.chat-header button { font-size:18px; color:var(--secondary); }
+.chat-messages { flex:1; overflow-y:auto; padding:16px 20px; }
+.chat-empty { text-align:center; color:var(--muted); font-size:13px; margin-top:40px; }
+
+.chat-msg-me, .chat-msg-them { margin-bottom:8px; }
+.chat-msg-me  { text-align:right; }
+.chat-msg-them{ text-align:left; }
+.chat-bubble {
+  display:inline-block; padding:8px 13px;
+  font-size:13px; max-width:70%;
+}
+.chat-msg-me   .chat-bubble { background:var(--primary); color:#fff; border-radius:14px 14px 3px 14px; }
+.chat-msg-them .chat-bubble { background:var(--bg-light); color:var(--primary); border-radius:14px 14px 14px 3px; }
+
+.chat-input-row {
+  display:flex; gap:8px; padding:12px 20px;
+  border-top:1px solid var(--border);
+}
+.chat-input-row input {
+  flex:1; padding:10px 14px;
+  border:1px solid var(--border); border-radius:20px; outline:none;
+}
+.chat-input-row button {
+  padding:10px 16px; background:var(--primary);
+  color:#fff; border-radius:20px; font-size:13px;
+}
+
+
+/* ====================================================
+   MY PAGE SIDEBAR
+   우측에서 슬라이드인
+==================================================== */
+.sidebar {
+  position:fixed; top:0; left:0; right:0; bottom:0;
+  z-index:1500;
+}
+.sidebar-backdrop {
+  position:absolute; top:0; left:0; right:0; bottom:0;
+  background:rgba(0,0,0,0.3);
+}
+
+/* 슬라이드 패널 */
+.sidebar-panel {
+  position:absolute; top:0; right:0;
+  width:var(--sidebar-w); height:100%;
+  background:#fff; overflow-y:auto;
+  animation:slideIn .28s ease;
+}
+@keyframes slideIn {
+  from { transform:translateX(100%); }
+  to   { transform:translateX(0); }
+}
+
+.sidebar-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:20px 20px 0;
+}
+.sidebar-header h2   { font-size:18px; font-weight:700; }
+.sidebar-header button { font-size:16px; color:var(--secondary); }
+
+/* 프로필 영역 */
+.mypage-profile {
+  text-align:center; padding:20px;
+  border-bottom:1px solid var(--border); margin-bottom:0;
+}
+.profile-avatar-lg {
+  width:64px; height:64px; border-radius:50%;
+  background:var(--bg-light);
+  display:flex; align-items:center; justify-content:center;
+  font-size:30px; margin:0 auto 10px;
+}
+.mypage-profile h3 { font-size:15px; font-weight:600; }
+.mypage-profile p  { font-size:12px; color:var(--secondary); }
+
+/* 탭 */
+.mypage-tabs {
+  display:flex; border-bottom:1px solid var(--border);
+  padding:0 20px; margin-bottom:0;
+}
+.tab-btn {
+  flex:1; padding:12px; font-size:13px;
+  color:var(--secondary); border-bottom:2px solid transparent; transition:all .2s;
+}
+.tab-btn.active { color:var(--primary); border-bottom-color:var(--primary); font-weight:600; }
+
+.tab-content        { display:none; padding:20px; }
+.tab-content.active { display:block; }
+
+.info-section { margin-bottom:22px; }
+.info-section h4 { font-size:14px; font-weight:600; margin-bottom:10px; }
+
+/* 룸메궁합 폼 */
+.compat-form { margin:12px 0; }
+.compat-item { margin-bottom:12px; }
+.compat-item label {
+  display:block; font-size:12px;
+  color:var(--secondary); margin-bottom:4px;
+}
+.compat-item select {
+  width:100%; padding:8px 10px;
+  border:1px solid var(--border); border-radius:var(--radius);
+  background:#fff; outline:none;
+}
+.compat-results {
+  margin-top:20px; padding:18px;
+  background:var(--bg-light); border-radius:var(--radius); text-align:center;
+}
+.compat-badge { font-size:36px; margin-bottom:6px; }
+
+
+/* ====================================================
+   RESPONSIVE
+==================================================== */
+@media (max-width: 900px) {
+  .nav-link { display:none; }
+  #chatBtn, .nav-link[data-page] { display:flex; }
+
+  .roomies-container {
+    grid-template-columns: 1fr;
+  }
+  .roomies-filter { position:static; }
+
+  .quotes-row { flex-direction:column; }
+  .map-sidebar { display:none; }
+  .section-roomies { padding:40px 24px; }
+  .takeon-header { flex-direction:column; align-items:flex-start; }
+}
+
+@media (max-width: 600px) {
+  .sidebar-panel { width:100%; }
+  .modal-box { margin:16px; }
+}
