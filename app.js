@@ -95,7 +95,7 @@ const ROOMIES_DATA = [
     desc:'서강대 22학번입니다. 조용하고 깔끔하게 지내실 분 구해요.',
     icon:'🐋', 
     sleep:'normal', clean:'very', noise:'sensitive', smoking:'no', guest:'rare', // 성향 5개
-    matchScore: null, // 초기 진입 시 숨김 처리용 플래그
+    mbti:'ISTJ', matchScore: null, // 초기 진입 시 숨김 처리용 플래그
     pos:{ left:'60%', top:'52%' },
   },
   {
@@ -105,7 +105,7 @@ const ROOMIES_DATA = [
     desc:'취준 중이라 집에 자주 있어요. 서로 존중하며 지내요.',
     icon:'🍏', 
     sleep:'late', clean:'normal', noise:'normal', smoking:'no', guest:'sometimes',
-    matchScore: null,
+    mbti:'INFP', matchScore: null,
     pos:{ left:'26%', top:'36%' },
   },
   {
@@ -115,7 +115,7 @@ const ROOMIES_DATA = [
     desc:'대학원생이라 평일엔 늦게 들어와요. 주말엔 활발히 지내요.',
     icon:'💜', 
     sleep:'late', clean:'normal', noise:'normal', smoking:'no', guest:'often',
-    matchScore: null,
+    mbti:'ENFJ', matchScore: null,
     pos:{ left:'52%', top:'30%' },
   },
   {
@@ -125,7 +125,7 @@ const ROOMIES_DATA = [
     desc:'밤에 주로 게임하지만 이어폰 씁니다. 낮에는 조용해요.',
     icon:'🌤️', 
     sleep:'late', clean:'normal', noise:'tolerant', smoking:'no', guest:'rare',
-    matchScore: null,
+    mbti:'ESTP', matchScore: null,
     pos:{ left:'65%', top:'58%' },
   },
 ];
@@ -693,6 +693,33 @@ function switchTab(btn, tabId) {
    MY PAGE SIDEBAR — 룸메궁합 분석
    취침시간·청결도·소음민감도 조합으로 룸메 유형 분류
 ==================================================== */
+
+function calcMbtiScore(myMbti, targetMbti) {
+  if (!myMbti || !targetMbti || myMbti.length !== 4 || targetMbti.length !== 4) {
+    return 0;
+  }
+
+  let matchCount = 0;
+
+  for (let i = 0; i < 4; i++) {
+    if (myMbti[i] === targetMbti[i]) {
+      matchCount++;
+    }
+  }
+
+  return (matchCount / 4) * 10;
+}
+
+function saveCompatProfile() {
+  const sleep = document.getElementById('compatSleep').value;
+  const clean = document.getElementById('compatClean').value;
+  const noise = document.getElementById('compatNoise').value;
+  const smoking = document.getElementById('compatSmoking').value;
+  const guest = document.getElementById('compatGuest').value;
+
+  ...
+}
+
 function saveCompatProfile() {
   const sleep  = document.getElementById('compatSleep').value;
   const clean  = document.getElementById('compatClean').value;
@@ -724,6 +751,11 @@ function saveCompatProfile() {
   // 3-1. 내 성향 데이터 변수 획득
   const smoking = document.getElementById('compatSmoking').value;
   const guest   = document.getElementById('compatGuest').value;
+  const mbti =
+     document.getElementById('compatEI').value +
+     document.getElementById('compatNS').value +
+     document.getElementById('compatTF').value +
+     document.getElementById('compatPJ').value;
 
   // 3-2. 전역 샘플 데이터 풀을 순회하며 5차원 L2-distance 연산 진행
   ROOMIES_DATA.forEach(roomie => {
@@ -736,11 +768,13 @@ function saveCompatProfile() {
     distanceSquared += Math.pow(COMPAT_SCORE_MAP.guest[guest] - COMPAT_SCORE_MAP.guest[roomie.guest], 2);
     distanceSquared += Math.pow(COMPAT_SCORE_MAP.smoking[smoking] - COMPAT_SCORE_MAP.smoking[roomie.smoking], 2);
 
-    // 10점 만점 정규화 환산 공식 (Max Distance^2 = 20)
-    let score = (1 - (distanceSquared / 20)) * 10.0;
-    
-    // 소수점 첫째 자리까지 깔끔하게 반올림하여 주입 (null 상태 탈출)
-    roomie.matchScore = Math.round(score * 10) / 10;
+    let lifestyleScore = (1 - (distanceSquared / 20)) * 10.0;
+    let mbtiScore = calcMbtiScore(mbti, roomie.mbti);
+
+    // 생활패턴 70% + MBTI 30%
+    let finalScore = (lifestyleScore * 0.7) + (mbtiScore * 0.3);
+
+    roomie.matchScore = Math.round(finalScore * 10) / 10;
   });
 
   // 3-3. 메인 화면에 뿌려지기 전에 점수가 높은 순서대로 데이터 풀 정렬(Order By)
