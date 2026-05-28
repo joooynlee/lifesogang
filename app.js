@@ -717,51 +717,39 @@ function saveCompatProfile() {
   const smoking = document.getElementById('compatSmoking').value;
   const guest = document.getElementById('compatGuest').value;
 
-  ...
-}
+  const mbti =
+    document.getElementById('compatEI').value +
+    document.getElementById('compatNS').value +
+    document.getElementById('compatTF').value +
+    document.getElementById('compatPJ').value;
 
-function saveCompatProfile() {
-  const sleep  = document.getElementById('compatSleep').value;
-  const clean  = document.getElementById('compatClean').value;
-  const noise  = document.getElementById('compatNoise').value;
-
-  // 간단 규칙 기반 유형 분류
   let emoji, type, desc;
+
   if (clean === 'very' && noise === 'sensitive') {
-    emoji = '✨'; type = '청결 민감형';
-    desc  = '깨끗하고 조용한 환경을 중시해요. 비슷한 성향의 룸메와 최고의 궁합!';
+    emoji = '✨';
+    type = '청결 민감형';
+    desc = '깨끗하고 조용한 환경을 중시해요. 비슷한 성향의 룸메와 최고의 궁합!';
   } else if (sleep === 'late' && noise === 'tolerant') {
-    emoji = '🌙'; type = '자유로운 밤형';
-    desc  = '늦게 자고 소음에 여유로워요. 활발한 룸메와도 잘 어울려요.';
+    emoji = '🌙';
+    type = '자유로운 밤형';
+    desc = '늦게 자고 소음에 여유로워요. 활발한 룸메와도 잘 어울려요.';
   } else if (sleep === 'early' && clean === 'very') {
-    emoji = '☀️'; type = '규칙적 깔끔형';
-    desc  = '일찍 자고 깔끔함을 선호해요. 규칙적인 생활의 룸메와 잘 맞아요.';
+    emoji = '☀️';
+    type = '규칙적 깔끔형';
+    desc = '일찍 자고 깔끔함을 선호해요. 규칙적인 생활의 룸메와 잘 맞아요.';
   } else {
-    emoji = '⚖️'; type = '균형 조화형';
-    desc  = '다양한 성향과 두루 잘 어울리는 유연한 타입이에요.';
+    emoji = '⚖️';
+    type = '균형 조화형';
+    desc = '다양한 성향과 두루 잘 어울리는 유연한 타입이에요.';
   }
 
   document.getElementById('compatBadge').textContent = emoji;
-  document.getElementById('compatType').textContent  = type;
-  document.getElementById('compatDesc').textContent  = desc;
+  document.getElementById('compatType').textContent = type;
+  document.getElementById('compatDesc').textContent = desc;
 
-   /* ====================================================
-     📍 [추가 Block 3] saveCompatProfile() 함수 내부에 삽입할 연산 로직
-     ==================================================== */
-  // 3-1. 내 성향 데이터 변수 획득
-  const smoking = document.getElementById('compatSmoking').value;
-  const guest   = document.getElementById('compatGuest').value;
-  const mbti =
-     document.getElementById('compatEI').value +
-     document.getElementById('compatNS').value +
-     document.getElementById('compatTF').value +
-     document.getElementById('compatPJ').value;
-
-  // 3-2. 전역 샘플 데이터 풀을 순회하며 5차원 L2-distance 연산 진행
   ROOMIES_DATA.forEach(roomie => {
     let distanceSquared = 0;
 
-    // 각 차원별 거리 제곱 합산 (Mapping Table 거치기)
     distanceSquared += Math.pow(COMPAT_SCORE_MAP.sleep[sleep] - COMPAT_SCORE_MAP.sleep[roomie.sleep], 2);
     distanceSquared += Math.pow(COMPAT_SCORE_MAP.clean[clean] - COMPAT_SCORE_MAP.clean[roomie.clean], 2);
     distanceSquared += Math.pow(COMPAT_SCORE_MAP.noise[noise] - COMPAT_SCORE_MAP.noise[roomie.noise], 2);
@@ -771,20 +759,16 @@ function saveCompatProfile() {
     let lifestyleScore = (1 - (distanceSquared / 20)) * 10.0;
     let mbtiScore = calcMbtiScore(mbti, roomie.mbti);
 
-    // 생활패턴 70% + MBTI 30%
-    let finalScore = (lifestyleScore * 0.7) + (mbtiScore * 0.3);
+    let finalScore = lifestyleScore * 0.7 + mbtiScore * 0.3;
 
     roomie.matchScore = Math.round(finalScore * 10) / 10;
   });
 
-  // 3-3. 메인 화면에 뿌려지기 전에 점수가 높은 순서대로 데이터 풀 정렬(Order By)
   ROOMIES_DATA.sort((a, b) => b.matchScore - a.matchScore);
 
-  // 3-4. 정렬된 최신 점수 판을 들고 메인 그리드 즉시 새로고침 호출
   renderRoomiesGrid(ROOMIES_DATA);
   document.getElementById('compatResults').classList.remove('hidden');
 
-  // 2초 후 룸메이트 페이지로 이동
   setTimeout(() => {
     closeSidebar();
     location.hash = 'roomies';
