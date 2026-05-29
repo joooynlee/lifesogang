@@ -26,9 +26,9 @@
 
     <div class="nav-right">
       <a href="#map"     class="nav-link" data-page="map">&#128205; Map</a>
-      <a href="#handover" class="nav-link" data-page="handover">🤝 Handover</a>
-      <a href="#board"    class="nav-link" data-page="board">✏️ Communities</a>
-      <a href="#roomies"  class="nav-link" data-page="roomies">👥 Roomies</a>
+      <a href="#takeon"  class="nav-link" data-page="takeon">take on</a>
+      <a href="#board"   class="nav-link" data-page="board">communities</a>
+      <a href="#roomies" class="nav-link" data-page="roomies">&#128101; roomies</a>
 
       <!-- 비로그인 상태: Sign in / Register 버튼 -->
       <div id="authButtons">
@@ -69,21 +69,13 @@
         </div>
       </section>
 
-      <!-- Handover 섹션: 이전 거주자가 올린 방 인수인계 및 물건 대여 미리보기 -->
+      <!-- 인수인계 섹션: 이전 거주자가 올린 방 매물 미리보기 -->
       <section class="section">
         <div class="section-header">
-          <h2 class="section-title">Handover</h2>
-          <p class="section-sub">방 인수인계와 물건 대여를 확인해보세요</p>
+          <h2 class="section-title">Take On</h2>
         </div>
         <div class="cards-row" id="takeonPreview"></div>
-      </section>
-
-      <!-- Communities 섹션: 자취방 후기·질문·꿀팁 미리보기 -->
-      <section class="section">
-        <div class="section-header">
-          <h2 class="section-title">Communities</h2>
-          <p class="section-sub">최근 자취 게시글</p>
-        </div>
+        <!-- 실거주자 익명 후기 3개 -->
         <div class="quotes-row" id="reviewsPreview"></div>
       </section>
 
@@ -219,41 +211,34 @@
     </div>
 
     <!-- ================================================
-         HANDOVER PAGE (#handover)
-         이전 거주자의 방 인수인계 및 물건 대여 게시판
+         TAKE ON PAGE (#takeon)
+         이전 거주자의 방 인수인계 게시판
     ================================================ -->
-    <div id="page-handover" class="page">
+    <div id="page-takeon" class="page">
       <div class="takeon-container">
         <div class="takeon-header">
           <div>
-            <h2>Handover</h2>
-            <p>방 인수인계와 물건 대여를 한곳에서 확인하세요</p>
+            <h2>Take On</h2>
+            <p>이전 거주자에게 방을 직접 인수인계 받으세요</p>
           </div>
           <!-- 등록: 로그인 필요 -->
-          <button class="btn-primary" onclick="openWriteTakeon()">Handover 등록</button>
+          <button class="btn-primary" onclick="openWriteTakeon()">인수인계 등록</button>
         </div>
 
         <!-- 지역·방 종류 필터 -->
         <div class="takeon-filters">
-          <select id="takeonCategory" onchange="applyTakeonFilter()">
-            <option value="">전체 유형</option>
-            <option value="room">방 인수인계</option>
-            <option value="rental">물건 대여</option>
-          </select>
           <select id="takeonArea" onchange="applyTakeonFilter()">
             <option value="">전체 지역</option>
             <option value="신촌">신촌</option>
             <option value="이대">이대</option>
-            <option value="대흥">대흥</option>
-            <option value="기타">기타</option>
+            <option value="홍대">홍대</option>
+            <option value="마포">마포</option>
           </select>
           <select id="takeonType" onchange="applyTakeonFilter()">
-            <option value="">전체 방/물건 종류</option>
+            <option value="">전체 방 종류</option>
             <option value="원룸">원룸</option>
             <option value="투룸">투룸</option>
             <option value="오피스텔">오피스텔</option>
-            <option value="가전제품">가전제품</option>
-            <option value="생활용품">생활용품</option>
           </select>
         </div>
 
@@ -379,62 +364,50 @@
   </div>
 
   <!-- ====================================================
-       MODAL: Handover 등록 (로그인 필요)
+       MODAL: 인수인계 등록 (로그인 필요)
   ==================================================== -->
   <div id="modal-writetakeon" class="modal hidden">
     <div class="modal-backdrop" onclick="closeModal('writetakeon')"></div>
     <div class="modal-box">
       <button class="modal-close" onclick="closeModal('writetakeon')">&#10005;</button>
-      <h2 class="modal-title">Handover 등록</h2>
+      <h2 class="modal-title">인수인계 등록</h2>
       <form onsubmit="submitTakeon(event)">
-        <div class="form-group">
-          <label>유형 *</label>
-          <select id="newTakeonCategory" required>
-            <option value="room">방 인수인계</option>
-            <option value="rental">물건 대여</option>
-          </select>
-        </div>
         <div class="form-group">
           <label>지역 *</label>
           <select id="newTakeonArea" required>
             <option value="">선택</option>
             <option value="신촌">신촌</option>
             <option value="이대">이대</option>
-            <option value="대흥">대흥</option>
+            <option value="홍대">홍대</option>
+            <option value="마포">마포</option>
             <option value="기타">기타</option>
           </select>
         </div>
         <div class="form-group">
-          <label>방/물건 종류 *</label>
+          <label>방 종류 *</label>
           <select id="newTakeonType" required>
             <option value="">선택</option>
             <option value="원룸">원룸</option>
             <option value="투룸">투룸</option>
             <option value="오피스텔">오피스텔</option>
-            <option value="가전제품">가전제품</option>
-            <option value="생활용품">생활용품</option>
           </select>
         </div>
         <div class="form-group">
-          <label>보증금 또는 대여비 (만원)</label>
-          <input type="number" id="newTakeonDeposit" placeholder="예: 500 또는 2" min="0" />
+          <label>보증금 (만원) *</label>
+          <input type="number" id="newTakeonDeposit" placeholder="예: 500" required min="0" />
         </div>
         <div class="form-group">
-          <label>월세 (방 인수인계 시, 만원)</label>
-          <input type="number" id="newTakeonRent" placeholder="예: 45" min="0" />
+          <label>월세 (만원) *</label>
+          <input type="number" id="newTakeonRent" placeholder="예: 45" required min="0" />
         </div>
         <div class="form-group">
-          <label>인수/대여 희망일 *</label>
+          <label>인수인계 희망일 *</label>
           <input type="date" id="newTakeonDate" required />
-        </div>
-        <div class="form-group">
-          <label>대여 기간</label>
-          <input type="text" id="newTakeonPeriod" placeholder="예: 7월~9월, 3개월" />
         </div>
         <div class="form-group">
           <label>상세 설명</label>
           <textarea id="newTakeonDesc" rows="4"
-            placeholder="방 상태, 포함 가구/가전, 물건 상태, 주의사항 등을 적어주세요"></textarea>
+            placeholder="방 상태, 포함 가구/가전, 특이사항 등을 적어주세요"></textarea>
         </div>
         <button type="submit" class="btn-primary btn-full">등록하기</button>
       </form>
@@ -524,29 +497,6 @@
               <option value="often">자주</option>
             </select>
           </div>
-
-          <div class="compat-item">
-            <label>MBTI</label>
-            <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px;">
-              <select id="compatEI">
-                <option value="E">E</option>
-                <option value="I">I</option>
-              </select>
-              <select id="compatNS">
-                <option value="N">N</option>
-                <option value="S">S</option>
-              </select>
-              <select id="compatTF">
-                <option value="T">T</option>
-                <option value="F">F</option>
-              </select>
-              <select id="compatPJ">
-                <option value="P">P</option>
-                <option value="J">J</option>
-              </select>
-            </div>
-          </div>
-          
         </div>
         <button class="btn-primary btn-full" onclick="saveCompatProfile()">저장 &amp; 룸메 찾기</button>
 
