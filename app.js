@@ -25,6 +25,7 @@ const state = {
   mapMode:    'properties',  // 지도 모드: 'properties' | 'roomies'
   boardCat:   'all',         // 게시판 필터 카테고리
   verifyCode: null,          // 이메일 인증 코드 (서버 미연동 시 클라이언트 보관)
+  detail: null,              // 상세 페이지 데이터 { type, id }
 };
 
 /* ====================================================
@@ -163,29 +164,6 @@ const POSTS_DATA = [
     content:'관리비에 포함되는 항목이 건물마다 다릅니다. 수도·전기·가스 별도인지, 인터넷 포함인지 꼭 확인하세요!',
     date:'2026-05-20', views:445, comments:23,
   },
-  {
-    id:6, cat:'review',
-    title:'대흥역 도보 7분 투룸 장기 실거주 후기',
-    content:'작년 3월부터 올해 2월까지 대흥역 근처 투룸에서 룸메이트와 함께 1년 정도 살았습니다. 가장 큰 장점은 학교까지 걸어서 12분 정도면 도착한다는 점이고, 밤에도 큰길을 따라 오면 비교적 밝아서 늦은 귀가가 크게 부담스럽지는 않았습니다. 방은 남향이라 낮에는 채광이 괜찮았고 겨울에도 난방 효율이 나쁘지 않았습니다. 다만 건물이 오래되어 창문 틈으로 바람이 조금 들어왔고, 장마철에는 화장실 쪽 습기가 오래 남는 편이었습니다. 관리인은 연락이 빠른 편이라 보일러 점검이나 수도 문제는 하루 안에 처리됐지만, 공용 복도 청소는 자주 이루어지지 않았습니다. 관리비는 월 7만원 정도였고 인터넷은 포함되어 있었지만 전기와 가스는 별도였습니다. 룸메와 함께 살기에는 거실 공간이 좁지 않아 괜찮았고, 냉장고와 세탁기 상태도 양호했습니다. 계약 전에는 창문 단열, 화장실 환기, 관리비 포함 항목을 꼭 확인하는 것을 추천합니다.',
-    aiSummary:'AI 요약: 학교 접근성과 채광, 관리 대응은 장점이며 화장실 습기, 창문 단열, 관리비 포함 항목은 계약 전 확인이 필요합니다.',
-    date:'2026-05-19', views:367, comments:18,
-  },
-  {
-    id:7, cat:'tip',
-    title:'처음 자취하는 새내기를 위한 방 보러 갈 때 체크 포인트',
-    content:'처음 자취방을 구할 때 사진만 보고 결정하면 후회하기 쉽습니다. 방을 보러 가면 먼저 낮과 밤의 주변 분위기를 모두 확인하는 것이 좋습니다. 낮에는 조용해 보여도 밤에는 술집 소음이나 오토바이 소리가 심할 수 있고, 반대로 밤길이 너무 어두운 골목은 혼자 귀가할 때 불안할 수 있습니다. 방 안에서는 수압을 직접 틀어보고, 온수가 바로 나오는지 확인해야 합니다. 화장실 천장과 벽 모서리, 창문 주변에 곰팡이 흔적이 있는지도 봐야 합니다. 관리비는 금액만 보지 말고 인터넷, 수도, 전기, 가스, 청소비 중 무엇이 포함되는지 확인해야 합니다. 계약서 특약에는 퇴거 청소비, 원상복구 범위, 중도 퇴실 시 조건이 적혀 있는 경우가 많으니 반드시 읽어야 합니다. 가능하면 실거주자 후기나 같은 건물에 살았던 사람의 이야기를 함께 참고하는 것이 좋습니다.',
-    aiSummary:'AI 요약: 방을 볼 때 주변 소음·밤길, 수압·온수, 곰팡이, 관리비 포함 항목, 계약서 특약을 함께 확인해야 합니다.',
-    date:'2026-05-18', views:512, comments:31,
-  },
-  {
-    id:8, cat:'question',
-    title:'[관리자 검토 필요] 특정 집주인 관련 과격한 비방글',
-    content:'이 집주인은 진짜 최악이고 사람 상대할 자격도 없습니다. 말도 안 통하고 완전 사기꾼 같아요. 다들 절대 계약하지 마세요. 이름이랑 연락처를 여기 올려버리고 싶네요. 이런 사람은 망해야 합니다.',
-    aiSummary:'AI 요약: 특정인을 향한 과격한 비방 및 개인정보 공개 암시가 포함되어 관리자 검토가 필요합니다.',
-    isToxic:true,
-    toxicReason:'특정인 비방·개인정보 공개 암시·공격적 표현 포함',
-    date:'2026-05-17', views:21, comments:0,
-  },
 ];
 
 /* ====================================================
@@ -210,47 +188,6 @@ function requireLogin(fn) {
 // 태그 뱃지 HTML 생성
 function renderTags(tags) {
   return tags.map(t => `<span class="tag">${t}</span>`).join('');
-}
-
-function detectToxicPost(text) {
-  const toxicKeywords = ['사기꾼', '망해야', '최악', '이름', '연락처', '올려버리고', '자격도 없습니다'];
-  const hit = toxicKeywords.filter(word => text.includes(word));
-  return {
-    isToxic: hit.length >= 2,
-    reason: hit.length >= 2 ? `악성 표현 의심 키워드: ${hit.join(', ')}` : ''
-  };
-}
-
-function summarizePost(text) {
-  const clean = text.replace(/\s+/g, ' ').trim();
-  if (clean.length <= 90) return clean;
-
-  const sentences = clean.split(/(?<=[.!?。！？]|다\.|요\.|니다\.)\s*/).filter(Boolean);
-  const first = sentences[0] || clean.slice(0, 90);
-  const keywords = [];
-
-  if (/관리비|수도|전기|가스|인터넷/.test(clean)) keywords.push('관리비');
-  if (/소음|방음|오토바이|술집/.test(clean)) keywords.push('소음');
-  if (/곰팡이|습기|환기|장마/.test(clean)) keywords.push('습기');
-  if (/수압|온수/.test(clean)) keywords.push('수압');
-  if (/계약서|특약|원상복구|중도 퇴실/.test(clean)) keywords.push('계약 유의사항');
-  if (/채광|남향|난방|단열/.test(clean)) keywords.push('주거환경');
-  if (/밤길|귀가|골목|안전/.test(clean)) keywords.push('안전');
-
-  const keywordText = keywords.length ? ` 핵심 키워드: ${keywords.slice(0, 4).join(', ')}.` : '';
-  return `AI 요약: ${first.slice(0, 95)}${first.length > 95 ? '…' : ''}${keywordText}`;
-}
-
-function getPostAnalysis(post) {
-  const toxic = post.isToxic !== undefined
-    ? { isToxic: post.isToxic, reason: post.toxicReason || '' }
-    : detectToxicPost(post.content);
-
-  return {
-    summary: post.aiSummary || summarizePost(post.content),
-    isToxic: toxic.isToxic,
-    reason: toxic.reason || post.toxicReason || '관리자 검토 필요'
-  };
 }
 
 function getHandoverLabel(item) {
@@ -281,6 +218,7 @@ function navigateTo(page) {
 
   // 지도 페이지 진입 시 목록·마커 렌더
   if (page === 'map') { renderMapList(); renderMapMarkers(); }
+  if (page === 'detail') { renderDetailPage(); }
 }
 
 function handleRoute() {
@@ -454,21 +392,18 @@ function renderTakeonPreview() {
 function renderReviewsPreview() {
   const reviews = POSTS_DATA.filter(p => p.cat === 'review').slice(0, 3);
   document.getElementById('reviewsPreview').innerHTML =
-    reviews.map(p => {
-      const analysis = getPostAnalysis(p);
-      return `
-        <div class="quote-card" onclick="location.hash='board'">
-          <div class="quote-text">"${analysis.summary.replace('AI 요약: ', '').substring(0, 80)}…"</div>
-          <div class="quote-user">
-            <div class="avatar">😶</div>
-            <div>
-              <div class="quote-name">익명</div>
-              <div class="quote-desc">${fmtDate(p.date)} · AI 요약</div>
-            </div>
+    reviews.map(p => `
+      <div class="quote-card" onclick="location.hash='board'">
+        <div class="quote-text">"${p.content.substring(0, 70)}…"</div>
+        <div class="quote-user">
+          <div class="avatar">😶</div>
+          <div>
+            <div class="quote-name">익명</div>
+            <div class="quote-desc">${fmtDate(p.date)}</div>
           </div>
         </div>
-      `;
-    }).join('');
+      </div>
+    `).join('');
 }
 
 /* ====================================================
@@ -545,29 +480,19 @@ function renderBoard(cat = 'all') {
   const catLabel = { review:'후기', question:'질문', tip:'꿀팁' };
   const list = cat === 'all' ? POSTS_DATA : POSTS_DATA.filter(p => p.cat === cat);
 
-  document.getElementById('postList').innerHTML = list.map(p => {
-    const analysis = getPostAnalysis(p);
-    return `
-      <div class="post-item" onclick="openPost(${p.id})">
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px">
-          <span class="post-category-badge badge-${p.cat}">${catLabel[p.cat]}</span>
-          <span class="post-status-badge ${analysis.isToxic ? 'status-warning' : 'status-safe'}">
-            ${analysis.isToxic ? '악성 의심' : 'AI 검토 완료'}
-          </span>
-        </div>
-        <div class="post-title">${p.title}</div>
-        <div class="post-preview">${p.content}</div>
-        <div class="ai-summary-box">${analysis.summary}</div>
-        ${analysis.isToxic ? `<div class="toxicity-alert">⚠️ ${analysis.reason}</div>` : ''}
-        <div class="post-meta">
-          <span>익명</span>
-          <span>${fmtDate(p.date)}</span>
-          <span>조회 ${p.views}</span>
-          <span>댓글 ${p.comments}</span>
-        </div>
+  document.getElementById('postList').innerHTML = list.map(p => `
+    <div class="post-item" onclick="openPost(${p.id})">
+      <span class="post-category-badge badge-${p.cat}">${catLabel[p.cat]}</span>
+      <div class="post-title">${p.title}</div>
+      <div class="post-preview">${p.content}</div>
+      <div class="post-meta">
+        <span>익명</span>
+        <span>${fmtDate(p.date)}</span>
+        <span>조회 ${p.views}</span>
+        <span>댓글 ${p.comments}</span>
       </div>
-    `;
-  }).join('');
+    </div>
+  `).join('');
 }
 
 // 카테고리 탭 클릭 — 버튼 활성화 + 목록 필터
@@ -583,17 +508,7 @@ function openPost(id) {
   requireLogin(() => {
     const p = POSTS_DATA.find(x => x.id === id);
     if (!p) return;
-    const analysis = getPostAnalysis(p);
-    alert(`[${p.title}]
-
-${p.content}
-
-─ AI 게시글 분석
-${analysis.summary}
-${analysis.isToxic ? `⚠️ 악성게시글 의심: ${analysis.reason}` : '✅ 악성 표현 특이사항 없음'}
-
-─
-작성일: ${p.date}  조회: ${p.views}`);
+    alert(`[${p.title}]\n\n${p.content}\n\n─\n작성일: ${p.date}  조회: ${p.views}`);
   });
 }
 
@@ -605,16 +520,11 @@ function openWritePost() {
 // 게시글 제출 — 목록 맨 앞에 추가
 function submitPost(e) {
   e.preventDefault();
-  const content = document.getElementById('postContent').value;
-  const toxic = detectToxicPost(content);
   const newPost = {
     id:      POSTS_DATA.length + 1,
     cat:     document.getElementById('postCategory').value,
     title:   document.getElementById('postTitle').value,
-    content,
-    aiSummary: summarizePost(content),
-    isToxic: toxic.isToxic,
-    toxicReason: toxic.reason,
+    content: document.getElementById('postContent').value,
     date:    new Date().toISOString().split('T')[0],
     views:   0, comments: 0,
   };
@@ -867,10 +777,142 @@ function saveCompatProfile() {
   }, 2000);
 }
 
+
+/* ====================================================
+   DETAIL PAGE — Handover / Communities / Roomies 상세 페이지
+==================================================== */
+function ensureDetailPage() {
+  if (document.getElementById('page-detail')) return;
+  const detail = document.createElement('div');
+  detail.id = 'page-detail';
+  detail.className = 'page';
+  detail.innerHTML = `<div class="detail-container" id="detailContent"></div>`;
+  document.getElementById('main').appendChild(detail);
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function getDetailBackHash(type) {
+  if (type === 'post') return 'board';
+  if (type === 'roomie') return 'roomies';
+  if (type === 'handover') return 'handover';
+  return 'home';
+}
+
+function renderDetailPage() {
+  ensureDetailPage();
+  const box = document.getElementById('detailContent');
+  if (!state.detail) {
+    box.innerHTML = `
+      <button class="detail-back" onclick="location.hash='home'">← 홈으로</button>
+      <div class="detail-card"><h2>상세 정보를 선택해주세요.</h2></div>
+    `;
+    return;
+  }
+
+  const { type, id } = state.detail;
+  const backHash = getDetailBackHash(type);
+
+  if (type === 'post') {
+    const p = POSTS_DATA.find(x => x.id === id);
+    if (!p) return;
+    const catLabel = { review:'후기', question:'질문', tip:'꿀팁' };
+    box.innerHTML = `
+      <button class="detail-back" onclick="location.hash='${backHash}'">← 목록으로 돌아가기</button>
+      <article class="detail-card detail-board-card">
+        <div class="detail-topline">
+          <span class="post-category-badge badge-${p.cat}">${catLabel[p.cat] || '게시글'}</span>
+          <span class="detail-meta">익명 · ${fmtDate(p.date)} · 조회 ${p.views} · 댓글 ${p.comments}</span>
+        </div>
+        <h2>${escapeHtml(p.title)}</h2>
+        ${p.aiSummary ? `<div class="detail-ai-box"><strong>AI 요약</strong><br>${escapeHtml(p.aiSummary)}</div>` : ''}
+        ${p.isToxic ? `<div class="detail-warning">⚠️ 악성게시글 의심: ${escapeHtml(p.toxicReason || '관리자 검토가 필요합니다.')}</div>` : ''}
+        <p class="detail-content-text">${escapeHtml(p.content).replace(/\n/g, '<br>')}</p>
+      </article>
+    `;
+    return;
+  }
+
+  if (type === 'roomie') {
+    const r = ROOMIES_DATA.find(x => x.id === id);
+    if (!r) return;
+    const genderLabel = r.gender === 'female' ? '여성' : r.gender === 'male' ? '남성' : '무관';
+    box.innerHTML = `
+      <button class="detail-back" onclick="location.hash='${backHash}'">← 목록으로 돌아가기</button>
+      <article class="detail-card">
+        <div class="detail-roomie-head">
+          <div class="avatar-lg">${r.icon}</div>
+          <div>
+            <h2>${escapeHtml(r.name)}</h2>
+            <p class="detail-subtitle">${escapeHtml(r.location)}</p>
+          </div>
+        </div>
+        <div class="detail-price">월 ${r.budget}만원</div>
+        <div class="roomie-tags detail-tags">${renderTags(r.tags)}</div>
+        ${r.matchScore !== null ? `<div class="detail-ai-box"><strong>AI 룸메 궁합 점수</strong><br>${r.matchScore}점</div>` : ''}
+        <dl class="detail-info-grid">
+          <div><dt>지역</dt><dd>${escapeHtml(r.area)}</dd></div>
+          <div><dt>성별</dt><dd>${genderLabel}</dd></div>
+          <div><dt>생활 스타일</dt><dd>${escapeHtml(r.style)}</dd></div>
+          <div><dt>MBTI</dt><dd>${escapeHtml(r.mbti || '미입력')}</dd></div>
+          <div><dt>취침</dt><dd>${escapeHtml(r.sleep)}</dd></div>
+          <div><dt>청결</dt><dd>${escapeHtml(r.clean)}</dd></div>
+          <div><dt>흡연</dt><dd>${r.smoking === 'no' ? '비흡연' : '흡연'}</dd></div>
+          <div><dt>손님 초대</dt><dd>${escapeHtml(r.guest)}</dd></div>
+        </dl>
+        <p class="detail-content-text">${escapeHtml(r.desc)}</p>
+        <button class="btn-primary detail-chat-btn" onclick="openChat('${escapeHtml(r.name)}')">작성자와 채팅하기</button>
+      </article>
+    `;
+    return;
+  }
+
+  if (type === 'handover') {
+    const item = TAKEON_DATA.find(x => x.id === id);
+    if (!item) return;
+    box.innerHTML = `
+      <button class="detail-back" onclick="location.hash='${backHash}'">← 목록으로 돌아가기</button>
+      <article class="detail-card">
+        <div class="detail-handover-hero">
+          <div class="detail-emoji">${item.emoji}</div>
+          <div>
+            <span class="detail-type-badge">${getHandoverLabel(item)}</span>
+            <h2>${escapeHtml(item.area)} ${escapeHtml(item.type)}</h2>
+            <p class="detail-subtitle">${escapeHtml(item.user.name)} · 인계 ${fmtDate(item.date)}</p>
+          </div>
+        </div>
+        <div class="detail-price">${getHandoverPrice(item)}</div>
+        <div class="roomie-tags detail-tags">${renderTags(item.tags)}</div>
+        <dl class="detail-info-grid">
+          <div><dt>지역</dt><dd>${escapeHtml(item.area)}</dd></div>
+          <div><dt>유형</dt><dd>${getHandoverLabel(item)}</dd></div>
+          <div><dt>종류</dt><dd>${escapeHtml(item.type)}</dd></div>
+          <div><dt>희망일</dt><dd>${escapeHtml(item.date)}</dd></div>
+          ${item.category === 'rental' ? `<div><dt>대여 기간</dt><dd>${escapeHtml(item.period || '협의')}</dd></div>` : `<div><dt>보증금</dt><dd>${item.deposit}만원</dd></div><div><dt>월세</dt><dd>${item.rent}만원</dd></div>`}
+        </dl>
+        <p class="detail-content-text">${escapeHtml(item.desc)}</p>
+        <button class="btn-primary detail-chat-btn" onclick="openChat('${escapeHtml(item.user.name)}')">작성자와 채팅하기</button>
+      </article>
+    `;
+  }
+}
+
+function openChat(name) {
+  alert(`${name}님과의 채팅 기능은 서버 연동 후 사용 가능합니다.`);
+}
+
 /* ====================================================
    초기화 — DOMContentLoaded
 ==================================================== */
 function init() {
+  ensureDetailPage();
   // 홈 화면 콘텐츠 렌더
   renderTakeonPreview();
   renderReviewsPreview();
